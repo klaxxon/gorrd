@@ -13,6 +13,19 @@ import (
 	"unsafe"
 )
 
+const (
+	CF_AVERAGE     = 0
+	CF_MINIMUM     = 1
+	CF_MAXIMUM     = 2
+	CF_LAST        = 3
+	CF_HWPREDICT   = 4
+	CF_SEASONAL    = 5
+	CF_DEVPREDICT  = 6
+	CF_DEVSEASONAL = 7
+	CF_FAILURES    = 8
+	CF_MHWPREDICT  = 9
+)
+
 // The Create function lets you set up new Round Robin Database (RRD) files.
 // The file is created at its final, full size and filled with *UNKNOWN* data.
 //
@@ -87,6 +100,35 @@ func Update(filename, template string, values []string) (err error) {
 	return
 }
 
+func Fetch(filename string, cf string, startTime uint64, endTime uint64, step uint64) (dsCount uint64, dsNames []string, data [][]float64, err error) {
+	cfilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cfilename))
+
+	// Newer version requires indices:
+	//cf_idx := 0
+	//cf_idx = stringToCf(cf)
+	//if cf_idx == -1 {
+	//	e = errors.New("Unable to convert cf : " + cf)
+	//	return
+	//}
+	ccf := C.CString(cf)
+
+	var cdsCount C.ulong
+	cstep := C.ulong(step)
+	var cdsNames ***C.char
+	var cdata **C.rrd_value_t
+
+	cst := C.time_t(startTime)
+	cet := C.time_t(endTime)
+
+	ret := C.rrd_fetch_r(cfilename, ccf, &cst, &cet, &cstep, &cdsCount, cdsNames, cdata)
+	if int(ret) != 0 {
+		err = errors.New(getError())
+	}
+
+	return
+}
+
 //----- Helper methods ---------------------------------------------------------
 
 func getError() string {
@@ -113,4 +155,60 @@ func freeCStringArray(cvalues []*C.char) {
 
 func getCStringArrayPointer(cvalues []*C.char) **C.char {
 	return (**C.char)(unsafe.Pointer(&cvalues[0]))
+}
+
+func stringToCf(cf string) int {
+	switch cf {
+	case "AVERAGE":
+		return CF_AVERAGE
+	case "MIN":
+		return CF_MINIMUM
+	case "MAX":
+		return CF_MAXIMUM
+	case "LAST":
+		return CF_LAST
+	case "HWPREDICT":
+		return CF_HWPREDICT
+	case "MHWPREDICT":
+		return CF_MHWPREDICT
+	case "DEVPREDICT":
+		return CF_DEVPREDICT
+	case "SEASONAL":
+		return CF_SEASONAL
+	case "DEVSEASONAL":
+		return CF_DEVSEASONAL
+	case "FAILURES":
+		return CF_FAILURES
+	default:
+		return -1
+	}
+	return -1
+}
+
+func cfToString(cf int) string {
+	switch cf {
+	case CF_AVERAGE:
+		return "AVERAGE"
+	case CF_MINIMUM:
+		return "MIN"
+	case CF_MAXIMUM:
+		return "MAX"
+	case CF_LAST:
+		return "LAST"
+	case CF_HWPREDICT:
+		return "HWPREDICT"
+	case CF_SEASONAL:
+		return "SEASONAL"
+	case CF_DEVPREDICT:
+		return "DEVPREDICT"
+	case CF_DEVSEASONAL:
+		return "DEVSEASONAL"
+	case CF_FAILURES:
+		return "FAILURES"
+	case CF_MHWPREDICT:
+		return "MHWPREDICT"
+	default:
+		return ""
+	}
+	return ""
 }
