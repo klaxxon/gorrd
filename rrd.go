@@ -10,6 +10,8 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
+	"time"
 	"unsafe"
 )
 
@@ -25,6 +27,15 @@ const (
 	CF_FAILURES    = 8
 	CF_MHWPREDICT  = 9
 )
+
+type RrdValue struct {
+	Time  time.Time
+	Value int64
+}
+
+func (this RrdValue) ToString() string {
+	return fmt.Sprintf("%d:%d", this.Time, this.Value)
+}
 
 // The Create function lets you set up new Round Robin Database (RRD) files.
 // The file is created at its final, full size and filled with *UNKNOWN* data.
@@ -98,6 +109,15 @@ func Update(filename, template string, values []string) (err error) {
 		err = errors.New(getError())
 	}
 	return
+}
+
+func UpdateValues(filename, template string, values []RrdValue) (err error) {
+	rrds := make([]string, len(values))
+	for i := 0; i < len(values); i++ {
+		rrds[i] = values[i].ToString()
+	}
+	err = Update(filename, template, rrds)
+	return err
 }
 
 func Fetch(filename string, cf string, startTime uint64, endTime uint64, step uint64) (dsCount uint64, dsNames []string, data [][]float64, err error) {
