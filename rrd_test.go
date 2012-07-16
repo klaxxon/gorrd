@@ -3,8 +3,8 @@ package rrd
 import (
 	"fmt"
 	"os"
-	"time"
 	"testing"
+	"time"
 )
 
 func TestCreateDs(t *testing.T) {
