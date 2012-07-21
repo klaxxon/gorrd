@@ -149,6 +149,21 @@ func Fetch(filename string, cf string, startTime uint64, endTime uint64, step ui
 	return
 }
 
+func Dump(filename string, out string) (err error) {
+	cfilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cfilename))
+
+	cout := C.CString(out)
+	defer C.free(unsafe.Pointer(cout))
+
+	ret := C.rrd_dump_r(cfilename, cout)
+	if int(ret) != 0 {
+		err = errors.New(getError())
+	}
+
+	return
+}
+
 //----- Helper methods ---------------------------------------------------------
 
 func getError() string {
