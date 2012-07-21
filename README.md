@@ -10,6 +10,10 @@ Simple Go interface for librrd library.
 
 Please note: `goinstall github.com/kpumuk/gorrd` does not work right now because of goinstall problems with cgo.
 
+## Using in other projects
+
+`go install github.com/jbuchbinder/gorrd/rrd`
+
 ## Example
 
     package main
@@ -17,7 +21,7 @@ Please note: `goinstall github.com/kpumuk/gorrd` does not work right now because
     import (
         "log"
         "fmt"
-        "rrd"
+        "github.com/jbuchbinder/gorrd/rrd"
         "time"
     )
     
@@ -39,3 +43,4 @@ Please note: `goinstall github.com/kpumuk/gorrd` does not work right now because
 To run the application, put the code in a file called rrdtest.go and run:
 
     8g rrdtest.go && 8l -o rrdtest rrdtest.8 && ./rrdtest
+
