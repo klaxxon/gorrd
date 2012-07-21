@@ -34,7 +34,7 @@ type RrdValue struct {
 }
 
 func (this RrdValue) ToString() string {
-	return fmt.Sprintf("%d:%d", this.Time, this.Value)
+	return fmt.Sprintf("%d:%d", this.Time.Unix(), this.Value)
 }
 
 // The Create function lets you set up new Round Robin Database (RRD) files.
@@ -147,6 +147,15 @@ func Fetch(filename string, cf string, startTime uint64, endTime uint64, step ui
 	}
 
 	return
+}
+
+func Last(filename string) time.Time {
+	cfilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cfilename))
+
+	ret := C.rrd_last_r(cfilename)
+
+	return time.Unix(int64(ret), 0)
 }
 
 func Dump(filename string, out string) (err error) {
