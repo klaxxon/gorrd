@@ -1,27 +1,29 @@
 package main
 
 import (
-	"log"
+	"../rrd"
 	"fmt"
-	"rrd"
+	"log"
 	"time"
 )
 
 func main() {
-	err := rrd.Create("test.rrd", 10, time.Seconds()-10, []string{
+	err := rrd.Create("test.rrd", int64(10), time.Now().Unix(), []string{
 		"DS:ok:GAUGE:600:0:U",
 		"RRA:AVERAGE:0.5:1:25920",
 	})
 	if err != nil {
-		log.Exitf("Error: %s", err)
+		log.Printf("Error: %s", err)
+		return
 	}
 
 	err = rrd.Update("test.rrd", "ok", []string{
-		fmt.Sprintf("%d:%d", time.Seconds(), 15),
+		fmt.Sprintf("%d:%d", time.Now(), 15),
 	})
 	if err != nil {
-		log.Exitf("Error: %s", err)
+		log.Printf("Error: %s", err)
+		return
 	}
 
-	log.Stdout("Everything is OK")
+	log.Printf("Everything is OK")
 }
