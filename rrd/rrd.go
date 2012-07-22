@@ -37,6 +37,35 @@ func (this RrdValue) ToString() string {
 	return fmt.Sprintf("%d:%d", this.Time.Unix(), this.Value)
 }
 
+func CfToString(cf int) string {
+	switch (cf) {
+	case CF_AVERAGE:
+		return "AVERAGE"
+	case CF_MINIMUM:
+		return "MIN"
+	case CF_MAXIMUM:
+		return "MAX"
+	case CF_LAST:
+		return "LAST"
+	case CF_HWPREDICT:
+		return "HWPREDICT"
+	case CF_SEASONAL:
+		return "SEASONAL"
+	case CF_DEVPREDICT:
+		return "DEVPREDICT"
+	case CF_DEVSEASONAL:
+		return "DEVSEASONAL"
+	case CF_FAILURES:
+		return "FAILURES"
+	case CF_MHWPREDICT:
+		return "MHWPREDICT"
+
+	default:
+		return ""
+	}
+	return ""
+}
+
 // The Create function lets you set up new Round Robin Database (RRD) files.
 // The file is created at its final, full size and filled with *UNKNOWN* data.
 //
@@ -137,28 +166,27 @@ func UpdateValues(filename, template string, values []RrdValue) (err error) {
 }
 
 // Fetch retrieves the values represented by an RRD file.
-func Fetch(filename string, cf string, startTime uint64, endTime uint64, step uint64) (dsCount uint64, dsNames []string, data [][]float64, err error) {
+func Fetch(filename string, cf int, startTime uint64, endTime uint64, step uint64) (dsCount uint64, dsNames []string, data [][]float64, err error) {
 	cfilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfilename))
 
-	// Newer version requires indices:
-	//cf_idx := 0
-	//cf_idx = stringToCf(cf)
-	//if cf_idx == -1 {
-	//	e = errors.New("Unable to convert cf : " + cf)
-	//	return
-	//}
-	ccf := C.CString(cf)
+	// Newer version requires indices
+	cf_idx := CfToString(cf)
+	if cf_idx == "" {
+		err = errors.New(fmt.Sprintf("Unable to convert cf : %d", cf))
+		return
+	}
+	ccf := C.CString(cf_idx)
 
 	var cdsCount C.ulong
 	cstep := C.ulong(step)
-	var cdsNames ***C.char
-	var cdata **C.rrd_value_t
+	var cdsNames **C.char
+	var cdata *C.rrd_value_t
 
 	cst := C.time_t(startTime)
 	cet := C.time_t(endTime)
 
-	ret := C.rrd_fetch_r(cfilename, ccf, &cst, &cet, &cstep, &cdsCount, cdsNames, cdata)
+	ret := C.rrd_fetch_r(cfilename, ccf, &cst, &cet, &cstep, &cdsCount, &cdsNames, &cdata)
 	if int(ret) != 0 {
 		err = errors.New(getError())
 	}
