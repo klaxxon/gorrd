@@ -111,6 +111,22 @@ func Update(filename, template string, values []string) (err error) {
 	return
 }
 
+// The UpdateValues function wraps the Update function, but provides a layer
+// of abstraction, in that it does not require manual formatting of the
+// RRD values being passed.
+//
+//      filename::
+//          The name of the RRD you want to create. RRD files should end with the
+//          extension .rrd. However, it accept any filename.
+//      template::
+//          The template switch allows you to specify which data sources you are going
+//          to update and in which order. If the data sources specified in the
+//          template are not available in the RRD file, the update process will
+//          abort with an error. Format: "ds-name[:ds-name]..."
+//      values::
+//          A list of RrdValues identifying values to be updated with
+//          corresponding timestamps.
+//
 func UpdateValues(filename, template string, values []RrdValue) (err error) {
 	rrds := make([]string, len(values))
 	for i := 0; i < len(values); i++ {
@@ -120,6 +136,7 @@ func UpdateValues(filename, template string, values []RrdValue) (err error) {
 	return err
 }
 
+// Fetch retrieves the values represented by an RRD file.
 func Fetch(filename string, cf string, startTime uint64, endTime uint64, step uint64) (dsCount uint64, dsNames []string, data [][]float64, err error) {
 	cfilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfilename))
@@ -149,6 +166,7 @@ func Fetch(filename string, cf string, startTime uint64, endTime uint64, step ui
 	return
 }
 
+// Last retrieves the last timestamp for a value represented by RRD data.
 func Last(filename string) time.Time {
 	cfilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfilename))
