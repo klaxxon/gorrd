@@ -38,7 +38,7 @@ func (this RrdValue) ToString() string {
 }
 
 func CfToString(cf int) string {
-	switch (cf) {
+	switch cf {
 	case CF_AVERAGE:
 		return "AVERAGE"
 	case CF_MINIMUM:
@@ -75,7 +75,7 @@ func CfToString(cf int) string {
 //      step::
 //          Specifies the base interval in seconds with which data will be
 //          fed into the RRD.
-//      start_time::
+//      startTime::
 //          Specifies the time in seconds since 1970-01-01 UTC when the first
 //          value should be added to the RRD. It will not accept any data timed
 //          before or at the time specified.
@@ -86,7 +86,7 @@ func CfToString(cf int) string {
 //
 // See http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html for detauls.
 //
-func Create(filename string, step, start_time int64, values []string) (err error) {
+func Create(filename string, step uint64, startTime time.Time, values []string) (err error) {
 	cfilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfilename))
 
@@ -94,7 +94,7 @@ func Create(filename string, step, start_time int64, values []string) (err error
 	defer freeCStringArray(cvalues)
 
 	clearError()
-	ret := C.rrd_create_r(cfilename, C.ulong(step), C.time_t(start_time),
+	ret := C.rrd_create_r(cfilename, C.ulong(step), C.time_t(startTime.Unix()),
 		C.int(len(values)), getCStringArrayPointer(cvalues))
 
 	if int(ret) != 0 {
