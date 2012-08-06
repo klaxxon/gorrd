@@ -1,7 +1,7 @@
 package main
 
 import (
-	"../rrd"
+	"../../rrd"
 	"log"
 	"os"
 	"time"
