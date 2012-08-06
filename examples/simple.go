@@ -16,7 +16,7 @@ func main() {
 	}()
 
 	log.Printf("Creating test.rrd")
-	err := rrd.Create("test.rrd", int64(resolution), time.Now().Unix(), []string{
+	err := rrd.Create("test.rrd", uint64(resolution), time.Now(), []string{
 		"DS:ok:GAUGE:600:0:U",
 		"RRA:AVERAGE:0.5:1:25920",
 	})
