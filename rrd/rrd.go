@@ -2,10 +2,12 @@
 package rrd
 
 // #cgo LDFLAGS: -lrrd_th
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include "rrd.h"
+/*
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "rrd.h"
+*/
 import "C"
 
 import (
@@ -166,7 +168,7 @@ func UpdateValues(filename, template string, values []RrdValue) (err error) {
 }
 
 // Fetch retrieves the values represented by an RRD file.
-func Fetch(filename string, cf int, startTime uint64, endTime uint64, step uint64) (dsCount uint64, dsNames []string, data [][]float64, err error) {
+func Fetch(filename string, cf int, startTime int64, endTime int64, step uint64) (dsCount uint64, dsNames []string, data []map[int64]float64, err error) {
 	cfilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfilename))
 
@@ -189,6 +191,34 @@ func Fetch(filename string, cf int, startTime uint64, endTime uint64, step uint6
 	ret := C.rrd_fetch_r(cfilename, ccf, &cst, &cet, &cstep, &cdsCount, &cdsNames, &cdata)
 	if int(ret) != 0 {
 		err = errors.New(getError())
+		return
+	}
+
+	// Figure out count
+	dsCount = uint64(cdsCount)
+
+	// Decode names of data sources
+	dsNames = make([]string, dsCount)
+	data = make([]map[int64]float64, dsCount)
+
+	nptr := *cdsNames
+	for iter := 0; iter < int(dsCount); iter++ {
+		dsNames[iter] = C.GoString(nptr)
+		data[iter] = make(map[int64]float64)
+		nptr = (*C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(cdsNames)) + uintptr(iter)))
+	}
+
+	vptr := cdata
+	for ti := startTime + int64(step); ti <= endTime; ti += int64(step) {
+		k := int64(ti)
+		for ii := 0; ii < int(dsCount); ii++ {
+			v := float64(*vptr)
+
+			// Add to appropriate map
+			data[ii][k] = v
+
+			vptr = (*C.rrd_value_t)(unsafe.Pointer(uintptr(unsafe.Pointer(vptr)) + 1))
+		}
 	}
 
 	return

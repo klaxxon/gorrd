@@ -45,15 +45,21 @@ func main() {
 	lastTime := rrd.Last("test.rrd")
 	log.Printf("Last time = %s", lastTime.String())
 
-	dsCount, dsNames, data, err := rrd.Fetch("test.rrd", rrd.CF_AVERAGE, uint64(time.Now().Unix()-30), uint64(time.Now().Unix()), uint64(resolution))
+	dsCount, dsNames, data, err := rrd.Fetch("test.rrd", rrd.CF_AVERAGE, time.Now().Unix()-30, time.Now().Unix(), uint64(resolution))
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return
 	}
 	// (dsCount uint64, dsNames []string, data [][]float64, err error) {
 	log.Printf("dsCount = %d, dsNames.len = %d, data.len = %d", dsCount, len(dsNames), len(data))
+	for i := 0; i < int(dsCount); i++ {
+		log.Printf("dsNames[%d] = %s\n", i, dsNames[i])
+		for k, v := range data[i] {
+			log.Printf("%d = %d\n", k, v)
+		}
+	}
 
-	err = rrd.Dump("test.rrd", "/dev/stderr")
+	//err = rrd.Dump("test.rrd", "/dev/stderr")
 
 	log.Printf("Everything is OK")
 }
