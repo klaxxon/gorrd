@@ -1,7 +1,7 @@
 // This is go-bindings package for librrd
 package rrd
 
-// #cgo LDFLAGS: -lrrd_th 
+// #cgo LDFLAGS: -lrrd_th
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <string.h>

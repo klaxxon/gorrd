@@ -2,7 +2,7 @@ package rrd
 
 import (
 	"fmt"
-  "os"
+	"os"
 	"testing"
 	"time"
 )
@@ -44,6 +44,8 @@ func TestUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error: %s", err)
 	}
+	t.Log("Waiting 2 seconds for sanity")
+	time.Sleep(time.Duration(2) * time.Second)
 	err = Update("test.rrd", "ok", []string{fmt.Sprintf("%d:%d", time.Now(), 15)})
 	if err != nil {
 		t.Fatalf("Error: %s", err)
@@ -61,23 +63,25 @@ func TestUpdateInvalidDs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error: %s", err)
 	}
+	t.Log("Waiting 2 seconds for sanity")
+	time.Sleep(time.Duration(2) * time.Second)
 	err = Update("test.rrd", "fail", []string{fmt.Sprintf("%d:%d", time.Now(), 15)})
 	if err == nil {
-		t.Fatalf("Expexted error: unknown DS name 'fail'", err)
+		t.Fatalf("Expected error: unknown DS name 'fail'", err)
 	}
 }
 
 func TestFetch(t *testing.T) {
-	dsCount, dsNames, data, err := Fetch("example.rrd", CF_AVERAGE, time.Now().Unix()-(30*3600*24), time.Now().Unix(), uint64(60))
+	dsCount, dsNames, data, err := Fetch("test.rrd", CF_AVERAGE, time.Now().Unix()-(30*3600*24), time.Now().Unix(), uint64(60))
 	if err != nil {
 		t.Errorf("Error: %s", err)
 		return
 	}
 	t.Logf("dsCount = %d\n", dsCount)
 	for n := 0; n < int(dsCount); n++ {
-		fmt.Printf("dsName[%d] = %s\n", n, dsNames[n])
+		t.Logf("dsName[%d] = %s\n", n, dsNames[n])
 		for k, v := range data[n] {
-			fmt.Printf("\t%d = %d\n", k, v)
+			t.Logf("\t%d = %d\n", k, v)
 		}
 	}
 
