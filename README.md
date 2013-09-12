@@ -1,14 +1,14 @@
 # gorrd
 
+[![Build Status](https://secure.travis-ci.org/jbuchbinder/gorrd.png)](http://travis-ci.org/jbuchbinder/gorrd)
+
 Simple Go interface for librrd library.
 
 ## Installation
 
 1. Make sure you have the a working Go environment. See the [install instructions](http://golang.org/doc/install.html). gorrd will always compile on the `release` tag.
-2. git clone git://github.com/kpumuk/gorrd.git
-3. cd gorrd && make install && make test
-
-Please note: `goinstall github.com/kpumuk/gorrd` does not work right now because of goinstall problems with cgo.
+2. `git clone git://github.com/kpumuk/gorrd.git`
+3. `cd gorrd/rrd && go build && go test -v`
 
 ## Using in other projects
 

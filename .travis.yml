@@ -3,6 +3,5 @@ go:
   - 1.0
   - 1.1
   - tip
-script:
-  - sudo apt-get install -y librrd-dev
-  - ( cd rrd ; go build ; go test -v )
+install:
+  - ( cd rrd ; go build && go test -v )
