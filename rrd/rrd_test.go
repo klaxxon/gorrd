@@ -83,7 +83,7 @@ func TestFetch(t *testing.T) {
 	for n := 0; n < int(dsCount); n++ {
 		t.Logf("dsName[%d] = %s\n", n, dsNames[n])
 		for k, v := range data[n] {
-			t.Logf("\t%d = %d\n", k, v)
+			//t.Logf("\t%d = %d\n", k, v)
 		}
 	}
 
