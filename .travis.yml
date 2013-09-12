@@ -4,4 +4,5 @@ go:
   - 1.1
   - tip
 install:
+  - sudo apt-get install -y librrd-dev
   - ( cd rrd ; go build && go test -v )
