@@ -74,7 +74,7 @@ func TestUpdateInvalidDs(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	dsCount, dsNames, data, err := Fetch("test.rrd", CF_AVERAGE, time.Now().Unix()-(30*3600*24), time.Now().Unix(), uint64(60))
+	dsCount, dsNames, /* data */_, err := Fetch("test.rrd", CF_AVERAGE, time.Now().Unix()-(30*3600*24), time.Now().Unix(), uint64(60))
 	if err != nil {
 		t.Errorf("Error: %s", err)
 		return
