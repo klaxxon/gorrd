@@ -1,7 +1,7 @@
 package main
 
 import (
-	"../../rrd"
+	"github.com/jbuchbinder/gorrd/rrd"
 	"log"
 	"os"
 	"time"
