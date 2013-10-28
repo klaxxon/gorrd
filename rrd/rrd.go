@@ -28,7 +28,16 @@ const (
 	CF_DEVSEASONAL = 7
 	CF_FAILURES    = 8
 	CF_MHWPREDICT  = 9
+
+	DS_GAUGE    = 0
+	DS_COUNTER  = 1
+	DS_DERIVE   = 2
+	DS_ABSOLUTE = 3
+	DS_COMPUTE  = 4
 )
+
+// Convenience type definition for DS types
+type DsType int
 
 type RrdValue struct {
 	Time  time.Time
