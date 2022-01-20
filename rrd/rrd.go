@@ -1,11 +1,12 @@
 // This is go-bindings package for librrd
 package rrd
 
-// #cgo LDFLAGS: -lrrd_th
+// #cgo LDFLAGS: -lrrd
 /*
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "rrd.h"
 */
 import "C"
